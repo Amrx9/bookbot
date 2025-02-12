@@ -1,11 +1,11 @@
 import string
 
 def numbers_words():
-    text = get_book_text(book)
+    text = get_file_text(text_file)
     num_words = get_words_num(text)
     print(f"{num_words} Words found on the document")
 
-def get_book_text(path):
+def get_file_text(path):
     with open(path) as f:
         return f.read()
 
@@ -17,7 +17,7 @@ def count_chars():
     letters = list(string.ascii_lowercase + string.punctuation + string.whitespace + ' ')
     count_words = {}
 
-    text = get_book_text(book)
+    text = get_file_text(text_file)
     lower_text = text.lower()
 
     for letter in letters: # a
@@ -34,7 +34,7 @@ def count_chars():
 
 def report():
 
-    print(f"--- Begin report of {book} ---")
+    print(f"--- Begin report of {text_file} ---")
     numbers_words()
     counts = count_chars()
 
@@ -42,6 +42,6 @@ def report():
         print(f"The '{key}' character was found {value} times")
     print("--- End report ---")
 
-book = "books/frankenstein.txt"
+text_file = "books/frankenstein.txt"
 
 report()
