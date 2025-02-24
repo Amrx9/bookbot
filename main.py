@@ -1,47 +1,85 @@
+# book_analyzer.py
 import string
+from collections import Counter
+from typing import Dict
 
-def numbers_words():
-    text = get_file_text(text_file)
-    num_words = get_words_num(text)
-    print(f"{num_words} Words found on the document")
+class BookAnalyzer:
+    def __init__(self, file_path: str):
+        """Initialize BookAnalyzer with a file path."""
+        self.file_path = file_path
+        self.text = self._read_file()
 
-def get_file_text(path):
-    with open(path) as f:
-        return f.read()
+    def _read_file(self) -> str:
+        """Read the contents of the file."""
+        try:
+            with open(self.file_path, 'r') as file:
+                return file.read()
+        except FileNotFoundError:
+            print(f"Error: Could not find file '{self.file_path}'")
+            return ""
+        except Exception as e:
+            print(f"Error reading file: {e}")
+            return ""
 
-def get_words_num(text):
-    words = text.split()
-    return len(words)
+    def count_words(self) -> int:
+        """Count total number of words in the text."""
+        return len(self.text.split())
 
-def count_chars():
-    letters = list(string.ascii_lowercase + string.punctuation + string.whitespace + ' ')
-    count_words = {}
+    def count_characters(self) -> Dict[str, int]:
+        """Count occurrences of each character in the text."""
+        # Convert text to lowercase for case-insensitive counting
+        text_lower = self.text.lower()
+        
+        # Create a string of all characters we want to count
+        countable_chars = string.ascii_lowercase + string.punctuation + string.whitespace
+        
+        # Use Counter for efficient character counting
+        char_counts = Counter(text_lower)
+        
+        # Filter out characters we don't want to count and zero counts
+        return {char: count for char, count in char_counts.items() 
+                if char in countable_chars and count > 0}
 
-    text = get_file_text(text_file)
-    lower_text = text.lower()
+    def generate_report(self) -> None:
+        """Generate and print the analysis report."""
+        if not self.text:
+            print("No text to analyze.")
+            return
 
-    for letter in letters: # a
-        counter = 0
-        for char in lower_text:
-            if letter == char:
-                counter += 1
-        if counter == 0:
-            continue
-        else:
-            count_words[letter] = counter
+        print(f"\n--- Begin report of {self.file_path} ---")
+        
+        # Word count
+        word_count = self.count_words()
+        print(f"Total words found: {word_count}")
+        
+        # Character count
+        char_counts = self.count_characters()
+        
+        # Sort characters by frequency (highest to lowest)
+        sorted_chars = sorted(char_counts.items(), key=lambda x: x[1], reverse=True)
+        
+        print("\nCharacter frequencies:")
+        for char, count in sorted_chars:
+            if char == ' ':
+                char_display = 'space'
+            elif char == '\n':
+                char_display = 'newline'
+            elif char == '\t':
+                char_display = 'tab'
+            else:
+                char_display = char
+            print(f"The '{char_display}' character was found {count} times")
+            
+        print("--- End report ---\n")
 
-    return count_words
+# main.py
+def main():
+    # File path
+    book_path = "books/frankenstein.txt"
+    
+    # Create analyzer and generate report
+    analyzer = BookAnalyzer(book_path)
+    analyzer.generate_report()
 
-def report():
-
-    print(f"--- Begin report of {text_file} ---")
-    numbers_words()
-    counts = count_chars()
-
-    for key, value in sorted(counts.items(), key=lambda item: item[1], reverse=True):
-        print(f"The '{key}' character was found {value} times")
-    print("--- End report ---")
-
-text_file = "books/frankenstein.txt"
-
-report()
+if __name__ == "__main__":
+    main()
